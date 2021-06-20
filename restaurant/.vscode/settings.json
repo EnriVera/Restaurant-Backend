@@ -1,0 +1,18 @@
+{
+    "sqltools.connections": [
+        {
+            "server": "127.0.0.1",
+            "port": 5444,
+            "driver": "PostgreSQL",
+            "name": "PostgreSQL",
+            // "username": "postgres",
+            // "database": "postgres",
+            // "password": "postgres",
+            "username": "restaurant",
+            "database": "postgres_restaurant",
+            "password": "rSUzRBlj4Sbi8625QHilqiCmcuMax2",
+            "askForPassword": false,
+            "connectionTimeout": 15
+        }
+    ]
+}

@@ -1,0 +1,15 @@
+version: "3.1"
+
+services:
+    db:
+      image: postgres
+      container_name: postgres
+      restart: always
+      ports:
+        - 5444:5432
+      environment:
+        - POSTGRES_DB=postgres_restaurant
+        - POSTGRES_USER=restaurant
+        - POSTGRES_PASSWORD=rSUzRBlj4Sbi8625QHilqiCmcuMax2
+      volumes:
+        - .:/user/bd/postgres
