@@ -2,22 +2,25 @@ import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import session from 'express-session';
-const redis = require('redis')
+const redis = require('redis');
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import csurf from 'csurf';
 import compression from 'compression';
 
-const RedisStore = require('connect-redis')(session)
-const redisClient = redis.createClient()
+const RedisStore = require('connect-redis')(session);
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
+  const redisClient = redis.createClient({
+    host: 'localhost',
+    port: 6385,
+  });
   // middleware
   app.use(
     session({
-      name: "restaurantSession",
+      name: 'restaurantSession',
       secret: process.env.KEY_SESSION,
       resave: false,
       saveUninitialized: false,
@@ -28,7 +31,7 @@ async function bootstrap() {
         // sameSite: true,
         // secure: process.env.NODE_ENV == 'production'
       },
-    })
+    }),
   );
   app.use(helmet());
   app.use(cookieParser());

@@ -31,6 +31,7 @@
     "@nestjs/swagger": "^4.8.0",
     "@prisma/client": "2.25.0",
     "bcrypt": "^5.0.1",
+    "class-validator": "^0.13.1",
     "compression": "^1.7.4",
     "connect-redis": "^6.0.0",
     "cookie-parser": "^1.4.5",
@@ -43,7 +44,8 @@
     "reflect-metadata": "^0.1.13",
     "rimraf": "^3.0.2",
     "rxjs": "^6.6.6",
-    "swagger-ui-express": "^4.1.6"
+    "swagger-ui-express": "^4.1.6",
+    "validator": "^13.6.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^7.6.0",

@@ -8,6 +8,8 @@ module.exports = {
   extends: [
     'plugin:@typescript-eslint/recommended',
     'plugin:prettier/recommended',
+    'plugin:@typescript-eslint/ban-types',
+    'prettier'
   ],
   root: true,
   env: {
