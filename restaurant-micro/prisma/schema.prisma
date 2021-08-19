@@ -1,0 +1,99 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model Google {
+  id              String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  logo            String?
+  googleID        String?
+  googleVerified  String?
+  peoples         People[]
+}
+
+model People {
+  id          String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name        String
+  email       String
+  password    String
+  google      Google?  @relation(fields: [id_google], references: [id])
+  id_google   String?  @db.Uuid
+  owners      Owner[]
+  waiters     Waiter[]
+}
+
+model Restaurant {
+  id          String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name        String
+  owner       Owner?  @relation(fields: [id_owner], references: [id])
+  id_owner    String  @db.Uuid
+  waiters     Waiter[]
+  products    Product[]
+  tables      Table[]
+}
+
+model Owner {
+  id            String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  people        People?  @relation(fields: [id_people], references: [id])
+  id_people     String  @db.Uuid
+  restaurant    Restaurant[]
+}
+
+model Waiter {
+  id            String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  number_waiter Int @unique
+  restaurant    Restaurant?  @relation(fields: [id_restaurant], references: [id])
+  id_restaurant String  @db.Uuid
+  people        People?  @relation(fields: [id_people], references: [id])
+  id_people     String  @db.Uuid
+  tables        Table[]
+}
+
+model Product {
+  id                String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  title             String
+  description       String?
+  type_plate_drink  String
+  price             Int
+  restaurant        Restaurant?  @relation(fields: [id_restaurant], references: [id])
+  id_restaurant     String  @db.Uuid
+  additionproducts  Additionproduct[]
+}
+
+model Table {
+  id            String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  name_table    String
+  count_chairs  Int
+  status        String
+  restaurant    Restaurant?  @relation(fields: [id_restaurant], references: [id])
+  id_restaurant String  @db.Uuid
+  waiter        Waiter?  @relation(fields: [id_waiter], references: [id])
+  id_waiter     String  @db.Uuid
+  addition      Addition[]
+}
+
+model Addition {
+  id                String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  date              DateTime
+  status            String
+  total             Int
+  table             Table?  @relation(fields: [id_table], references: [id])
+  id_table          String  @db.Uuid
+  additionproducts  Additionproduct[]
+}
+
+model Additionproduct {
+  id            String  @id @db.Uuid @default(dbgenerated("gen_random_uuid()"))
+  count_product Int
+  addition      Addition?  @relation(fields: [id_addition], references: [id])
+  id_addition   String  @db.Uuid
+  product       Product?  @relation(fields: [id_product], references: [id])
+  id_product    String  @db.Uuid
+}

@@ -64,18 +64,11 @@ $ npm run test:cov
 # JWT session
 $ SECRET_JWT = "hi123"
 
-# Express session
-$ KEY_SESSION = 123
+$ NODE_ENV = "development"
+$ BROKER_KAFKA = "localhost:1234"
 
-# Kafka
-$ CLIENT_KAFKA = "localhost:1234"
-
-# Redis
-$ HOT_REDIS = "localhost"
-$ POST_REDIS = 1234
-
-# Port application
-$ PORT = 4782
+# Connection to your BD
+$ DATABASE_URL = "postgresql://bd:password@localhost/name?schema=public"
 ```
 
 ## Support

@@ -1,13 +1,9 @@
-import { KafkaModule } from './kafka.module';
+import { RestaurantMicroModule } from './restaurant-micro/restaurant-micro.module';
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
-      envFilePath: '.env',
-    }),
-    KafkaModule
+    RestaurantMicroModule
   ],
   controllers: [],
   providers: [],

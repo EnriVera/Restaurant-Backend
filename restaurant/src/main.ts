@@ -1,27 +1,32 @@
+import { LoggerMiddleware } from './restaurant-micro/logger.middelware';
 import { NestFactory } from '@nestjs/core';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger';
 import { AppModule } from './app.module';
 import session from 'express-session';
+import Store from 'connect-redis';
 const redis = require('redis');
 import cookieParser from 'cookie-parser';
 import helmet from 'helmet';
 import csurf from 'csurf';
 import compression from 'compression';
+import { Logger } from '@nestjs/common';
 
-const RedisStore = require('connect-redis')(session);
-
+const logger = new Logger();
+const { KEY_SESSION, HOT_REDIS, POST_REDIS, PORT } = process.env;
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, { cors: true });
 
+  const RedisStore = Store(session);
   const redisClient = redis.createClient({
-    host: 'localhost',
-    port: 6385,
+    host: HOT_REDIS,
+    port: POST_REDIS,
   });
+
   // middleware
   app.use(
     session({
       name: 'restaurantSession',
-      secret: process.env.KEY_SESSION,
+      secret: KEY_SESSION,
       resave: false,
       saveUninitialized: false,
       store: new RedisStore({ client: redisClient }),
@@ -35,7 +40,8 @@ async function bootstrap() {
   );
   app.use(helmet());
   app.use(cookieParser());
-  app.use(csurf());
+  // app.use(csurf());
+  app.use(LoggerMiddleware);
   app.use(compression());
   const config = new DocumentBuilder()
     .setTitle('Restaurant')
@@ -46,6 +52,6 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-  await app.listen(3000);
+  await app.listen(PORT, () => logger.log('To ready in port: ' + PORT));
 }
 bootstrap();

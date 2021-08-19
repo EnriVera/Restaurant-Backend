@@ -58,24 +58,24 @@ $ npm run test:e2e
 $ npm run test:cov
 ```
 
-## .env
+## Test
 
 ```bash
-# JWT session
-$ SECRET_JWT = "hi123"
+$ NODE_ENV = "development"
 
-# Express session
-$ KEY_SESSION = 123
+$ BROKER_KAFKA = "localhost:1234"
 
-# Kafka
-$ CLIENT_KAFKA = "localhost:1234"
+# Data of your SMTP
+$ SMTP_HOTS = smtp.mailtrap.io
+$ SMTP_USER = 8932995282b97a
+$ SMTP_PORT = 2525
+$ SMTP_PASS = 5c09efbc7cf270
 
-# Redis
-$ HOT_REDIS = "localhost"
-$ POST_REDIS = 1234
+# Url of your frontend
+$ URL_WEB = http://localhost:3000/
 
-# Port application
-$ PORT = 4782
+# You email for send email to their user
+$ PERSONAL_EMAIL = "veracarlosenrique99@gmail.com"
 ```
 
 ## Support
