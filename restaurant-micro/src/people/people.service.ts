@@ -12,9 +12,10 @@ export class PeopleService implements IPeople {
   public async PrepareEmailPeople(
     createPersonDto: CreatePersonDto,
   ): Promise<any> {
-    const mailformat = /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
-    if(!mailformat.test(createPersonDto.email)) {
-      return {Error: "Email Not valid"}
+    const mailformat =
+      /(?:[a-z0-9!#$%&'*+/=?^_`{|}~-]+(?:\.[a-z0-9!#$%&'*+/=?^_`{|}~-]+)*|"(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21\x23-\x5b\x5d-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])*")@(?:(?:[a-z0-9](?:[a-z0-9-]*[a-z0-9])?\.)+[a-z0-9](?:[a-z0-9-]*[a-z0-9])?|\[(?:(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9]))\.){3}(?:(2(5[0-5]|[0-4][0-9])|1[0-9][0-9]|[1-9]?[0-9])|[a-z0-9-]*[a-z0-9]:(?:[\x01-\x08\x0b\x0c\x0e-\x1f\x21-\x5a\x53-\x7f]|\\[\x01-\x09\x0b\x0c\x0e-\x7f])+)\])/;
+    if (!mailformat.test(createPersonDto.email)) {
+      return { Error: 'Email Not valid' };
     }
     const user = await Prisma.FindPeople(
       this.prisma,
@@ -30,14 +31,24 @@ export class PeopleService implements IPeople {
       password: hash,
     });
     return {
-      name: createPersonDto.name,
-      email: createPersonDto.email,
-      hash: jwt,
+      user: {
+        name: createPersonDto.name,
+        email: createPersonDto.email,
+        hash: jwt,
+      },
     };
   }
   public async CreatePeople(createPersonDto: CreatePersonDto) {
-    const dd = await Prisma.CreatePeople(this.prisma, createPersonDto)
-    console.log(dd)
+    try{
+      const create = await Prisma.CreatePeople(this.prisma, {
+        name: createPersonDto.name,
+        email: createPersonDto.email,
+        password: createPersonDto.password,
+      });
+      return { user: create };
+    } catch(e) {
+      return { Error: 'Error the create to user' };
+    }
   }
 }
 
@@ -70,7 +81,7 @@ class Prisma {
   ) {
     return await prisma.people.create({
       data: {
-        ...value
+        ...value,
       },
     });
   }

@@ -22,11 +22,15 @@ import { JwtService } from '@nestjs/jwt';
 import { basename } from 'path';
 
 const SECRET_JWT = process.env;
+const Dataso = {
+  PrepareEmailPerson: 'PrepareEmailPerson',
+  CreatePerson: 'CreatePerson'
+}
 @ApiTags('people')
 @Controller('people')
 export class PeopleController implements OnModuleInit {
   constructor(
-    @Inject('KAFKA_SERVICee')
+    @Inject('KAFKA_SERVICE')
     public clientKafka: ClientKafka,
     private jwtService: JwtService,
   ) {
@@ -34,8 +38,9 @@ export class PeopleController implements OnModuleInit {
   }
 
   async onModuleInit() {
-    this.clientKafka.subscribeToResponseOf(['PrepareEmailPerson', 'CreatePerson']);
-    // await this.clientKafka.connect();
+    this.clientKafka.subscribeToResponseOf(Dataso.PrepareEmailPerson);
+    this.clientKafka.subscribeToResponseOf(Dataso.CreatePerson);
+    await this.clientKafka.connect();
 }
 
   @Post('/emailsignup')
@@ -48,13 +53,13 @@ export class PeopleController implements OnModuleInit {
   public async CreateEmailPerson(@Body() jwtPerson: any, @Res() res:Response): Promise<any> {
     const person = this.jwtService.verify(jwtPerson.jwt);
     const resultInfo = await this.clientKafka
-        .send("PrepareEmailPerson", JSON.stringify(person))
+        .send(Dataso.PrepareEmailPerson, JSON.stringify(person))
         .toPromise();
     // const resultInfo = await super.Send({
     //   tipe: 'PrepareEmailPerson',
     //   value: person,
     // });
-    await res.status(201).send({message: resultInfo.value})
+    await res.status(resultInfo.code).send({message: resultInfo.value})
   }
 
   @Post('/signup')
@@ -69,11 +74,11 @@ export class PeopleController implements OnModuleInit {
       //   tipe: 'CreatePerson',
       //   value: person,
       // });
-      if (!resultInfo.Error) {
-        req.session.user = resultInfo.user;
-        return { message: 'People create' };
+      if (resultInfo.code === 201) {
+        req.session.user = resultInfo.value;
+        res.status(201).send({message: 'People create'})
       }
-      return { message: resultInfo.Error };
+      else res.status(resultInfo.code).send({message: resultInfo.value })
     } catch (error) {
       if (error instanceof TokenExpiredError){
         res.status(404).send({message: 'Token expired'})

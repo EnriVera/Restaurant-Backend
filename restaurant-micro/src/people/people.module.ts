@@ -12,20 +12,20 @@ const {SECRET_JWT, BROKER_KAFKA} = process.env;
       secret: SECRET_JWT,
       signOptions: { expiresIn: 20*20 },
     }),
-    // ClientsModule.register([
-    //   {
-    //     name: 'KAFKA_SERVICE',
-    //     transport: Transport.KAFKA,
-    //     options: {
-    //       client: {
-    //         brokers: [BROKER_KAFKA],
-    //       },
-    //       consumer: {
-    //         groupId: 'restaurant-micro-consumer-'+Math.random()
-    //       },
-    //     },
-    //   },
-    // ]),
+    ClientsModule.register([
+      {
+        name: 'KAFKA_SERVICE',
+        transport: Transport.KAFKA,
+        options: {
+          client: {
+            brokers: [BROKER_KAFKA],
+          },
+          consumer: {
+            groupId: 'restaurant-micro-consumer-'+Math.random()
+          },
+        },
+      },
+    ]),
   ],
   controllers: [PeopleController],
   providers: [PeopleService, PrismaService]

@@ -19,37 +19,41 @@ export class PeopleController implements OnModuleInit {
   constructor(
     @Inject(forwardRef(() => PeopleService))
     private readonly peopleService: IPeople,
-    // @Inject('KAFKA_SERVICE')
-    // private client: ClientProxy,
+    @Inject('KAFKA_SERVICE')
+    private client: ClientProxy,
   ) {}
 
   async onModuleInit() {
-    // this.KafkaProducer = await this.client.connect();
+    this.KafkaProducer = await this.client.connect();
   }
 
   @MessagePattern('PrepareEmailPerson')
   public async CreateEmailPerson(@Ctx() createPersonDto: KafkaContext) {
     const personDTO: CreatePersonDto = this.NewBuffer<CreatePersonDto>(createPersonDto);
     const objectEmail = await this.peopleService.PrepareEmailPeople(personDTO);
+    
     if (!objectEmail.Error) {
-      // this.KafkaProducer.send({
-      //   topic: 'SignUpPerson',
-      //   messages: [
-      //     {
-      //       key: Math.random() + '-kf',
-      //       value: JSON.stringify(objectEmail),
-      //     },
-      //   ],
-      // });
-      return { value: 'Send Email' };
+      this.KafkaProducer.send({
+        topic: 'SignUpPerson',
+        messages: [
+          {
+            key: Math.random() + '-kf',
+            value: JSON.stringify(objectEmail.user),
+          },
+        ],
+      });
+      return JSON.stringify({  code: 201, value: 'Send Email' });
     }
-    return { value: objectEmail.Error };
+    else return JSON.stringify({ code: 404, value: objectEmail.Error });
   }
   @MessagePattern('CreatePerson')
   public async CreatePerson(@Ctx() createPersonDto: KafkaContext) {
     const personDTO = await this.NewBuffer<CreatePersonDto>(createPersonDto)
-    const respose = await this.peopleService.CreatePeople(personDTO)
-    return respose;
+    const objectEmail = await this.peopleService.CreatePeople(personDTO)
+    if (!objectEmail.Error) {
+      return JSON.stringify({  code: 201, value: objectEmail.user });
+    }
+    else return JSON.stringify({ code: 404, value: objectEmail.Error });
   }
 
   private NewBuffer<T>(KafkaContext: KafkaContext) {

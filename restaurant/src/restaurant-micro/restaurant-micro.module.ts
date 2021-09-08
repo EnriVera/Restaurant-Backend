@@ -12,7 +12,7 @@ const {SECRET_JWT, CLIENT_KAFKA} = process.env
     }),
     ClientsModule.register([
       {
-        name: 'KAFKA_SERVICee',
+        name: 'KAFKA_SERVICE',
         transport: Transport.KAFKA,
         options: {
           client: {
