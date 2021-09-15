@@ -12,8 +12,10 @@ import compression from 'compression';
 import { Logger } from '@nestjs/common';
 
 const logger = new Logger();
-const { KEY_SESSION, HOT_REDIS, POST_REDIS, PORT } = process.env;
+const { KEY_SESSION, HOT_REDIS, POST_REDIS, PORT, NODE_ENV } = process.env;
 async function bootstrap() {
+  // const app = await NestFactory.create(AppModule);
+  // await app.listen(3000);
   const app = await NestFactory.create(AppModule, { cors: true });
 
   const RedisStore = Store(session);
@@ -33,12 +35,12 @@ async function bootstrap() {
       cookie: {
         httpOnly: true,
         maxAge: 1000 * 60 * 60 * 24 * 7,
+        secure: NODE_ENV == 'production',
         // sameSite: true,
-        // secure: process.env.NODE_ENV == 'production'
       },
     }),
   );
-  app.use(helmet());
+  // app.use(helmet());
   app.use(cookieParser());
   // app.use(csurf());
   app.use(LoggerMiddleware);

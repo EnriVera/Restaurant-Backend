@@ -25,7 +25,7 @@ const {SECRET_JWT, CLIENT_KAFKA} = process.env
       },
     ]),
   ],
-  controllers: [PeopleController],
-  providers: [],
+  controllers: [],
+  providers: [PeopleController],
 })
 export class RestaurantMicroModule {}

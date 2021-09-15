@@ -8,7 +8,7 @@ import {
   Payload,
 } from '@nestjs/microservices';
 import { PeopleService } from './people.service';
-import { CreatePersonDto } from './dto/create-person.dto';
+import { PersonDto } from './dto/person.dto';
 import { UpdatePersonDto } from './dto/update-person.dto';
 import IPeople from 'src/people/interface/people.interface';
 import { Producer } from 'kafkajs';
@@ -29,9 +29,9 @@ export class PeopleController implements OnModuleInit {
 
   @MessagePattern('PrepareEmailPerson')
   public async CreateEmailPerson(@Ctx() createPersonDto: KafkaContext) {
-    const personDTO: CreatePersonDto = this.NewBuffer<CreatePersonDto>(createPersonDto);
+    const personDTO: PersonDto = this.NewBuffer<PersonDto>(createPersonDto);
     const objectEmail = await this.peopleService.PrepareEmailPeople(personDTO);
-    
+
     if (!objectEmail.Error) {
       this.KafkaProducer.send({
         topic: 'SignUpPerson',
@@ -42,23 +42,32 @@ export class PeopleController implements OnModuleInit {
           },
         ],
       });
-      return JSON.stringify({  code: 201, value: 'Send Email' });
-    }
-    else return JSON.stringify({ code: 404, value: objectEmail.Error });
+      return JSON.stringify({ code: 201, value: 'Send Email' });
+    } else return JSON.stringify({ code: 404, value: objectEmail.Error });
   }
   @MessagePattern('CreatePerson')
   public async CreatePerson(@Ctx() createPersonDto: KafkaContext) {
-    const personDTO = await this.NewBuffer<CreatePersonDto>(createPersonDto)
-    const objectEmail = await this.peopleService.CreatePeople(personDTO)
+    const personDTO = await this.NewBuffer<PersonDto>(createPersonDto);
+    const objectEmail = await this.peopleService.CreatePeople(personDTO);
+    return this.Response(objectEmail)
+  }
+
+  @MessagePattern('SignInPerson')
+  public async SignInPerson(@Ctx() PersonDto: KafkaContext) {
+    const personDTO = await this.NewBuffer<PersonDto>(PersonDto);
+    const objectEmail = await this.peopleService.SignInPeople(personDTO);
+    return this.Response(objectEmail)
+  }
+
+  private Response(objectEmail) {
     if (!objectEmail.Error) {
-      return JSON.stringify({  code: 201, value: objectEmail.user });
-    }
-    else return JSON.stringify({ code: 404, value: objectEmail.Error });
+      return JSON.stringify({ code: 201, value: objectEmail.user });
+    } else return JSON.stringify({ code: 404, value: objectEmail.Error });
   }
 
   private NewBuffer<T>(KafkaContext: KafkaContext) {
     const buffer = JSON.stringify(KafkaContext.getMessage().value);
     const DTO: T = JSON.parse(buffer);
-    return DTO
+    return DTO;
   }
 }

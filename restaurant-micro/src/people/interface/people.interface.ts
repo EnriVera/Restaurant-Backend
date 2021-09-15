@@ -1,6 +1,7 @@
-import { CreatePersonDto } from "src/people/dto/create-person.dto";
+import { PersonDto } from "src/people/dto/person.dto";
 
 export default interface IPeople {
-    PrepareEmailPeople(createPersonDto: CreatePersonDto): Promise<any>
-    CreatePeople(createPersonDto: CreatePersonDto)
+    PrepareEmailPeople(createPersonDto: PersonDto): Promise<any>
+    CreatePeople(createPersonDto: PersonDto)
+    SignInPeople(PersonDto: PersonDto)
 }
